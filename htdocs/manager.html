@@ -1,0 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>DNS-320 Download Manager</title>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<link rel="shortcut icon" href="favicon.ico" />
+	<link href="css/style.css" media="screen" rel="stylesheet" type="text/css" />
+	<script type='text/javascript' src='js/jquery.js'></script>
+	<script type='text/javascript'>
+	<!--
+		$(document).ready(function() {
+			$('.quarter').click(function(){
+				$(this).parent().prev().children('span').css('width','25%');
+				});
+			$('.half').click(function(){
+				$(this).parent().prev().children('span').css('width','50%');
+				});
+			$('.three-quarters').click(function(){
+				$(this).parent().prev().children('span').css('width','75%');
+				});
+			$('.full').click(function(){
+				$(this).parent().prev().children('span').css('width','100%');
+			});
+			
+			var defaultInputValue = "Download URL";
+			
+			$('input#formInput').val(defaultInputValue);
+			$('input#formInput').addClass('inputDefaultValue');
+			
+			$('input#formInput').blur(function() {
+				if ($(this).val() == '' || $(this).val() == defaultInputValue) {
+					$(this).val(defaultInputValue);
+					$(this).addClass('inputDefaultValue');
+				} else {
+					$(this).removeClass('inputDefaultValue');
+				}
+			});
+			
+			$('input#formInput').focus(function() {
+				if ($(this).val() == defaultInputValue) {
+					$(this).val('');
+					$(this).removeClass('inputDefaultValue');
+				}
+			});
+			
+			/**
+			 * Lauching a new download
+			 */
+			$('div#formSubmit').click(function() {
+				downloadMessage.set(false, '');
+				
+				var fileURL = $('#formInput').val();
+				if (!/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/.test(fileURL)) {
+					downloadMessage.set(true, 'Download error: Please fill the form with a valid http or ftp url.');
+					return false;
+				}
+
+				$('#formInput').addClass('inputDefaultValue').attr('disabled', 'disabled');
+				$('#formSubmit').fadeOut(100, function() { $('#formLoader').fadeIn() });
+				
+				$.ajax({
+					url: '/add-url',
+					dataType: 'json',
+					data: 'fileURL=' + encodeURI(fileURL),
+					success: function(ajaxReturn) {
+						$('#formLoader').fadeOut(100, function() { $('#formSubmit').fadeIn() });
+						$('#formInput').removeClass('inputDefaultValue').removeAttr('disabled');
+						downloadMessage.set(false, 'Download launched successfully.');
+
+						download.display(true, ajaxReturn.filename, fileURL, 0);
+					},
+					error: function(ajaxReturn) {
+						$('#formLoader').fadeOut(100, function() { $('#formSubmit').fadeIn() });
+						$('#formInput').removeClass('inputDefaultValue').removeAttr('disabled');
+						downloadMessage.set(true, 'Download error: An error has occured during the download request.');
+					}
+				})
+				
+				
+			});
+		});
+		
+		/**
+		 * Download Message Handler/Setter
+		 */
+		var downloadMessage = {
+			set: function (isError, downloadMessage) {
+				$('#downloadMessage').removeClass('errorColor').removeClass('successColor');
+				$('#downloadMessage').html(downloadMessage);
+			
+				if (isError)	$('#downloadMessage').addClass('errorColor');
+				else			$('#downloadMessage').addClass('successColor');
+			}
+		};
+			
+		var colours = [ 'blue', 'orange', 'green' ];
+		var currentColor 	= 0;
+		var totalDownloads 	= 0; 
+		var downloadFileList = [ ];
+
+		var download = {
+			display: function(currentDownload, filename, fileURL, filePercent, fileSpeed) {
+				
+				filePercent = (filePercent) ? filePercent : 0; 
+				fileSpeed = (fileSpeed) ? fileSpeed : 0;
+
+				fileClasses = (currentDownload) ? 'blue stripes' : 'green';
+				
+				totalDownloads++;
+			
+				var HTML = '';
+				HTML	+= "<div style='' class='download-filename'>" + filename + "</div>";
+				HTML	+= "<div style='height: 35px;' class='downloadStatus' id='currentDownload." + totalDownloads + "' filename='" + filename + "' fileUrl='" + fileURL.replace(/'/g, "-") + "'>";
+				HTML	+= "	<div style='float: left;' class='progress-bar " + fileClasses + "'><span style='width: " + filePercent + "%'></span></div>";
+				HTML	+= "	<div style='float: left; color: white; line-height: 35px; margin-left: 10px; font-size: 20px'>" + filePercent + " %</div>";
+				
+				if (currentDownload)
+					HTML	+= "	<div style='float: left; color: white; line-height: 35px; margin-left: 10px; font-size: 20px'>" + fileSpeed + "</div>";
+					
+				HTML	+= "</div>";
+
+				if (currentDownload)
+					$('div#currentDownloads').append(HTML);
+				else
+					$('div#completedDownloads').append(HTML);
+			},
+			
+			update: function(filename, fileURL, filePercent, fileSpeed)
+			{
+				filePercent = (filePercent) ? filePercent : 0;
+				fileSpeed = (fileSpeed) ? fileSpeed : 0;
+				
+				var downloadElement = download.returnDivElement(fileURL);
+				
+				$(downloadElement).children().children().css('width', filePercent + '%');
+				$(downloadElement).children().next().html(filePercent + ' %');
+				$(downloadElement).children().next().next().html(fileSpeed);
+				
+				if ((filePercent >= 100) && (download.returnDivElement_Completed(fileURL) === false))
+				{
+					$(downloadElement).prev().remove();
+					$(downloadElement).remove();
+					download.display(false, filename, fileURL, filePercent);
+				}
+			},
+			
+			getStatus: function(fileURL) {
+				$.ajax({
+					url: 'ajax/checkDownload.php',
+					dataType: 'json',
+					data: 'fileURL=' + encodeURI(fileURL),
+					success: function(ajaxReturn) {
+						return 5;
+					},
+					error: function(ajaxReturn) {
+						return 5;
+					}
+				});
+			},
+
+			returnDivElement: function(fileURL) {
+				var foundElement = false;
+				
+				$('.downloadStatus').each(function(downloadIndex, downloadElement) {
+					if ($(downloadElement).attr('fileurl').replace(/'/g, "-") == fileURL.replace(/'/g, "-"))
+						foundElement = $(downloadElement);
+				});
+				
+				return foundElement;
+			},
+			
+			returnDivElement_Completed: function(fileURL) {
+				var foundElement = false;
+				
+				$('#completedDownloads .downloadStatus').each(function(downloadIndex, downloadElement) {
+					if ($(downloadElement).attr('fileurl') == fileURL)
+						foundElement = $(downloadElement);
+				});
+				
+				return foundElement;
+			},
+			
+			getAllStatuses: function() {
+				$.getJSON('/check-dl', null, function(ajaxReturn) {
+					$.each(ajaxReturn, function(downloadIndex, downloadElement) {
+						downloadElement.fileURL  		= downloadElement[0];
+						downloadElement.filename 		= downloadElement[1];
+						downloadElement.filetype		= downloadElement[2];
+						downloadElement.filesize		= downloadElement[3];
+						downloadElement.downloaded		= downloadElement[4];
+						downloadElement.downloadStatus	= downloadElement[5];
+						downloadElement.downloadCheck	= downloadElement[6];
+						downloadElement.downloadSpeed	= downloadElement[7];
+						downloadElement.downloadPercent = downloadElement[8];
+						
+						divElement = download.returnDivElement(downloadElement.fileURL);
+						if (divElement !== false)
+						{
+							download.update(downloadElement.filename, downloadElement.fileURL, downloadElement.downloadPercent, downloadElement.downloadSpeed);
+						}
+						else
+						{
+							// Create Div
+							var Completed = (downloadElement.downloadStatus == '3') ? true : false;
+							download.display(!Completed, downloadElement.filename, downloadElement.fileURL, downloadElement.downloadPercent, downloadElement.downloadSpeed);
+						}
+
+					});
+				});
+			}
+			
+		};
+		
+
+		setInterval(function() {
+			download.getAllStatuses();
+		}, 3000);
+
+		
+		download.getAllStatuses();
+	-->
+	</script>
+</head>
+<body>
+
+<div id='downloadForm'>
+	<div class='input-background'><input type='text' id='formInput' /></div>
+	<div class='input-button button' id='formSubmit'>Download</div>
+	<div id='formLoader' style='display: none; float: left; margin-left: 40px;'><img src='/images/loader.gif'/></div>
+</div>
+<div id='downloadMessage'></div>
+
+<h1>Current downloads</h1>
+
+<div id='currentDownloads'></div>
+
+
+<h1>Completed downloads</h1>
+
+<div id='completedDownloads'></div>
+
+<!--
+<p>Set above to:
+	<a href="#" class="quarter">25%</a> /
+	<a href="#" class="half">50%</a> /
+	<a href="#" class="three-quarters">75%</a> /
+	<a href="#" class="full">100%</a>
+</p>
+
+<div class="progress-bar orange stripes">
+    <span style="width: 40%"></span>
+</div>
+<p>Set above to:
+	<a href="#" class="quarter">25%</a> /
+	<a href="#" class="half">50%</a> /
+	<a href="#" class="three-quarters">75%</a> /
+	<a href="#" class="full">100%</a>
+</p>
+
+<div class="progress-bar green stripes">
+    <span style="width: 40%"></span>
+</div>
+<p>Set above to:
+	<a href="#" class="quarter">25%</a> /
+	<a href="#" class="half">50%</a> /
+	<a href="#" class="three-quarters">75%</a> /
+	<a href="#" class="full">100%</a>
+</p>--></body>
+</html>
