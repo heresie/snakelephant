@@ -102,11 +102,11 @@ class QueueManager(object):
             file_infos[Settings.QINDEX_DOWNLOADED] = 0
 
         if int(file_infos[Settings.QINDEX_STATUS]) == 3:
-            file_infos[Settings.QINDEX_PERCENT] = "%.2f" % 100
+            file_infos[Settings.QINDEX_PERCENT] = 100
             file_infos[Settings.QINDEX_DOWNLOADED] = file_infos[Settings.QINDEX_SIZE]
             file_infos[Settings.QINDEX_SPEED] = "%.2f b/s" % 0
         else:
-            file_infos[Settings.QINDEX_PERCENT] = "%.2f" % ((int(file_infos[Settings.QINDEX_DOWNLOADED]) * 100) / int(file_infos[Settings.QINDEX_SIZE]))
+            file_infos[Settings.QINDEX_PERCENT] = ((int(file_infos[Settings.QINDEX_DOWNLOADED]) * 100) / int(file_infos[Settings.QINDEX_SIZE]))
 
             delta_time = int(time.time()) - int(file_infos[Settings.QINDEX_TIMESTAMP_START])
                         

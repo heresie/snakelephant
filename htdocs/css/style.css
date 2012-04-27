@@ -1,6 +1,6 @@
 body {
 	background: #222 url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAMAAAC67D+PAAAAFVBMVEUqKiopKSkoKCgjIyMuLi4kJCQtLS0dJckpAAAAO0lEQVR42iXLAQoAUQhCQSvr/kfe910jHIikElsl5qVFa1iE5f0Pom/CNZdbNM6756lQ41NInMfuFPgAHVEAlGk4lvIAAAAASUVORK5CYII=");
-	width: 660px;
+	width: 490px;
 	margin: 0 auto;  
 	font: 13px 'trebuchet MS',Arial,Helvetica;
 }
@@ -16,18 +16,21 @@ a {
 }
 
 h1 {
+	margin-left: 5px;
 	color: #555;
 	font-style: italic;
 	text-shadow: -1px -1px #111, 1px 1px #999 !important;
 }
 
 #downloadForm {
+	margin-left: 5px;
 	width: 100%; 
 	height: 50px; 
 	margin-top: 15px;
 }
 
 #downloadMessage {
+	text-align: center;
 	margin-bottom: 15px;
 }
 
@@ -80,14 +83,15 @@ h1 {
 	color: white;
 	text-align: left;
 	font-style: italic;
-	margin: 10px 0px 5px 5px;
+	margin: 10px 5px 5px 10px;
 }
 
 .progress-bar {
+	margin-left: 5px;
     background-color: #1a1a1a;
     height: 25px;
     padding: 5px;
-    width: 350px;
+    width: 465px;
     -moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
@@ -95,7 +99,8 @@ h1 {
 	-webkit-box-shadow: 0 1px 5px #000 inset, 0 1px 0 #444;
 	box-shadow: 0 1px 5px #000 inset, 0 1px 0 #444;           
 }
-        
+
+
 .progress-bar span {
     display: inline-block;
     height: 100%;
@@ -112,6 +117,41 @@ h1 {
 	-o-transition: width .4s ease-in-out;
 	transition: width .4s ease-in-out;		
 }
+
+
+.freespace-bar {
+	margin-top: 20px;
+	margin-left: 5px;
+    background-color: #1a1a1a;
+    height: 15px;
+    padding: 5px;
+    width: 465px;
+    -moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+    -moz-box-shadow: 0 1px 5px #000 inset, 0 1px 0 #444;
+	-webkit-box-shadow: 0 1px 5px #000 inset, 0 1px 0 #444;
+	box-shadow: 0 1px 5px #000 inset, 0 1px 0 #444;           
+}
+
+
+.freespace-bar span {
+    display: inline-block;
+    height: 100%;
+	background-color: #777;
+    -moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+    -moz-box-shadow: 0 1px 0 rgba(255, 255, 255, .5) inset;
+	-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, .5) inset;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, .5) inset;
+	-webkit-transition: width .4s ease-in-out;
+	-moz-transition: width .4s ease-in-out;
+	-ms-transition: width .4s ease-in-out;
+	-o-transition: width .4s ease-in-out;
+	transition: width .4s ease-in-out;		
+}
+
 
 /*---------------------------*/			
 
@@ -363,3 +403,27 @@ h1 {
         content: "\25B6";
 }
 
+.spacedata-percent {
+	width: 200px;
+	line-height: 15px;
+	text-align: center;
+	font-size: 12px;
+	color: black;
+	text-shadow: -1px -1px #C98A4B;	
+}
+
+.progress-percent {
+	width: 200px;
+	line-height: 25px;
+	text-align: center;
+	color: white;
+	text-shadow: -1px -1px #111, 1px 1px #777 !important;	
+}
+
+#copyright {
+	font-size: 10px;
+	text-align: center;
+	margin-top: 15px;
+	margin-bottom: 15px;
+	color: #AAA;
+}

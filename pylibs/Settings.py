@@ -1,4 +1,4 @@
-import ConfigParser
+import ConfigParser, base64
 
 configuration_file = 'snakelephant.ini'
 
@@ -26,6 +26,9 @@ try:
     server_port = int(config.get('webserver', 'port'))
     root_path = config.get('webserver', 'root_path')
     log_dir = config.get('webserver', 'log_dir')
+    web_username = config.get('webserver', 'web_username')
+    web_password = config.get('webserver', 'web_password')
+    web_credentials = base64.b64encode(web_username + ':' + web_password)
 
     print "Current configuration from %s" % configuration_file
     print "==================================================="
@@ -38,6 +41,8 @@ try:
     print "server_port       : %s" % server_port
     print "root_path         : %s" % root_path
     print "log_dir           : %s" % log_dir
+    print "web_username      : %s" % web_username
+    print "web_credentials   : %s" % web_credentials
     print ""
 
 except IOError:
